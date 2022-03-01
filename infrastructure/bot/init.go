@@ -53,6 +53,8 @@ func NewBotTele() *TelegramBot {
             ChatId:    config.ChatId,
             TimeDelay: config.TimeDelay,
         }
+
+        teleBot.SendChat(fmt.Sprintf(constant.InitBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))
     }
 
     return teleBot
