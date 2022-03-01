@@ -1,24 +1,32 @@
 package service
 
 import (
-	"github.com/labstack/echo"
-	"time"
+    "botTele/infrastructure/bot"
+    "botTele/infrastructure/logger"
+    "github.com/labstack/echo"
+    "time"
 )
 
 type IHealthCheckService interface {
-	Status(c echo.Context) error
+    Status(c echo.Context) error
 }
 
 type HealthCheckService struct {
-	Timeout time.Duration
+    Bot     *bot.TelegramBot
+    Timeout time.Duration
 }
 
 func NewHealthCheckService(timeout time.Duration) IHealthCheckService {
-	return &HealthCheckService{
-		Timeout: timeout,
-	}
+    return &HealthCheckService{
+        Bot:     bot.NewBotTele(),
+        Timeout: timeout,
+    }
 }
 
 func (service *HealthCheckService) Status(c echo.Context) error {
-	return nil
+    err := service.Bot.Status()
+    if err != nil {
+        logger.Error("HealthCheckService::SendChat: - Send chat error: %v", err)
+    }
+    return nil
 }
