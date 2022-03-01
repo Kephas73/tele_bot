@@ -1,0 +1,21 @@
+{
+  "Debug": false,
+  "Server": {
+    "Address": ":9096"
+  },
+  "Log": {
+    "Path": "./log/BotTele",
+    "Prefix": "botTele",
+    "Description": "Must set write-permission for /var/log/BotTele"
+  },
+  "Context": {
+    "Timeout": 30
+  },
+  "TelegramApi": {
+    "Token": "",
+    "ChatId": [
+      11111111
+    ],
+    "TimeDelay": 2
+  }
+}
