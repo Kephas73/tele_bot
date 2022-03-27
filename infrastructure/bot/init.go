@@ -59,6 +59,7 @@ func NewBotTele() *TelegramBot {
         teleBot = &TelegramBot{
             Bot:               bot,
             BotExpirationTime: time.Now().Add(time.Minute * time.Duration(config.ExpirationTime)).Unix(),
+            ExpirationTime:    config.ExpirationTime,
             Token:             config.Token,
             ChatId:            config.ChatId,
             TimeDelay:         config.TimeDelay,
