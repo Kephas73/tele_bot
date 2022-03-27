@@ -11,7 +11,7 @@ var ReplyMsg = []string{
 
 const (
     InitBot      string = "👉 Bot: %s đã bật 😍 😍 😍"
-    ReconnectBot string = "👉 Bot: %s kết nối lại thành công 😍 😍 😍"
+    ReconnectBot string = "👉 Bot: %s đã được kết nối lại 😓 😓 😓"
     ShutdownBot  string = "👉 Bot: %s đã tắt ☹ ☹ ☹"
     IsBot        string = "✅ "
     BotAliveMsg         = "Tôi vẫn còn hoạt động 😜 😜 😜"

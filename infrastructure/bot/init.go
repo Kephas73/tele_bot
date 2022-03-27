@@ -124,6 +124,6 @@ func (botTele *TelegramBot) ReconnectBotTele() {
         botTele.Bot = bot
         botTele.BotExpirationTime = time.Now().Add(time.Minute * time.Duration(botTele.ExpirationTime)).Unix()
 
-        //botTele.SendChat(fmt.Sprintf(constant.ReconnectBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))
+        botTele.SendChat(fmt.Sprintf(constant.ReconnectBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))
     }
 }
