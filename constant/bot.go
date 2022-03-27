@@ -10,11 +10,12 @@ var ReplyMsg = []string{
 }
 
 const (
-    InitBot     string = "👉 Bot: %s đã bật 😍 😍 😍"
-    ShutdownBot string = "👉 Bot: %s đã tắt ☹ ☹ ☹"
-    IsBot       string = "✅ "
-    BotAliveMsg        = "Tôi vẫn còn hoạt động 😜 😜 😜"
-    HelpMsg     string = `Bạn có thể sử dụng các lệnh bên dưới:
+    InitBot      string = "👉 Bot: %s đã bật 😍 😍 😍"
+    ReconnectBot string = "👉 Bot: %s kết nối lại thành công 😍 😍 😍"
+    ShutdownBot  string = "👉 Bot: %s đã tắt ☹ ☹ ☹"
+    IsBot        string = "✅ "
+    BotAliveMsg         = "Tôi vẫn còn hoạt động 😜 😜 😜"
+    HelpMsg      string = `Bạn có thể sử dụng các lệnh bên dưới:
 
 help - thông tin các lệnh có thể sử dụng
 health - kiểm tra bot còn sống hay không
@@ -22,4 +23,8 @@ now - ngày giờ hiện tại
 name - lấy tên bot
 other - tự động trả lời
 `
+)
+
+const (
+    ExpiresThenMinute = 10
 )

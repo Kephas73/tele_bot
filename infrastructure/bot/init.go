@@ -12,9 +12,10 @@ import (
 )
 
 type Config struct {
-    Token     string  `json:"token,omitempty"`
-    ChatId    []int64 `json:"chat_id,omitempty"`
-    TimeDelay int     `json:"time_delay,omitempty"`
+    Token          string  `json:"token,omitempty"`
+    ExpirationTime int     `json:"expiration_time,omitempty"`
+    ChatId         []int64 `json:"chat_id,omitempty"`
+    TimeDelay      int     `json:"time_delay,omitempty"`
 }
 
 var (
@@ -22,10 +23,13 @@ var (
 )
 
 type TelegramBot struct {
-    Bot       *tgbotapi.BotAPI
-    ChatId    []int64
-    TimeDelay int
-    ReplyMsg  []string
+    Bot               *tgbotapi.BotAPI
+    BotExpirationTime int64
+    ExpirationTime    int
+    Token             string
+    ChatId            []int64
+    TimeDelay         int
+    ReplyMsg          []string
 }
 
 var teleBot *TelegramBot
@@ -40,6 +44,10 @@ func NewBotTele() *TelegramBot {
             panic(err)
         }
 
+        if config.ExpirationTime <= 0 {
+            config.ExpirationTime = constant.ExpiresThenMinute
+        }
+
         bot, err := tgbotapi.NewBotAPI(config.Token)
         if err != nil {
             logger.Info("Failed bot error: %v", err)
@@ -49,9 +57,11 @@ func NewBotTele() *TelegramBot {
         logger.Info("Success bot: Authorized on account %s", bot.Self.UserName)
 
         teleBot = &TelegramBot{
-            Bot:       bot,
-            ChatId:    config.ChatId,
-            TimeDelay: config.TimeDelay,
+            Bot:               bot,
+            BotExpirationTime: time.Now().Add(time.Minute * time.Duration(config.ExpirationTime)).Unix(),
+            Token:             config.Token,
+            ChatId:            config.ChatId,
+            TimeDelay:         config.TimeDelay,
         }
 
         teleBot.SendChat(fmt.Sprintf(constant.InitBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))
@@ -99,4 +109,21 @@ func (botTele *TelegramBot) AutoReply() {
 
 func IsBotMsg(msg string) string {
     return fmt.Sprintf("%s %s", constant.IsBot, msg)
+}
+
+func (botTele *TelegramBot) ReconnectBotTele() {
+    if botTele.BotExpirationTime < time.Now().Unix() {
+        bot, err := tgbotapi.NewBotAPI(botTele.Token)
+        if err != nil {
+            logger.Info("Failed bot error: %v", err)
+            panic(err)
+        }
+        bot.Debug = true
+        logger.Info("Success reconnect bot: Authorized on account %s", bot.Self.UserName)
+
+        botTele.Bot = bot
+        botTele.BotExpirationTime = time.Now().Add(time.Minute * time.Duration(botTele.ExpirationTime)).Unix()
+
+        //botTele.SendChat(fmt.Sprintf(constant.ReconnectBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))
+    }
 }

@@ -14,8 +14,8 @@ func Initialize(e *echo.Echo, timeout time.Duration) {
     botService := service.NewBotService(timeout)
     mBotController = controller.NewBotController(botService)
     BotServiceGlobal = botService
-    
-    go botService.AutoReply()
+
+    //go botService.AutoReply()
 
     initRouter(e)
 }

@@ -9,6 +9,7 @@ import (
 )
 
 func (botTele *TelegramBot) SendChat(sendMsg interface{}) error {
+    botTele.ReconnectBotTele()
     var msg tgbotapi.MessageConfig
 
     if len(botTele.ChatId) != constant.ValueEmpty {
@@ -25,6 +26,7 @@ func (botTele *TelegramBot) SendChat(sendMsg interface{}) error {
 }
 
 func (botTele *TelegramBot) Status() error {
+    botTele.ReconnectBotTele()
     var msg tgbotapi.MessageConfig
 
     if len(botTele.ChatId) != constant.ValueEmpty {
