@@ -35,6 +35,24 @@ POST: /bot/send-chat
 ### Auto reply
 Auto reply messages
 
+### Send message for api telegram
+```
+Set config: 
+    "TelegramApi": {
+        "SendMessageUri": "https://api.telegram.org/bot%s/sendMessage?chat_id=%d&text=%s",
+        "Token": "xxxxxxxxxxx",
+        "ChatId": [
+            -xxxxxxx
+        ],
+        "TimeDelay": 2,
+        "ExpirationTime": 1
+    }
+    
+Note: 
+    Api support: https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<msg>    
+```
+Demo: func SendMessageForApiTele()
+
 ---
 
 Contributions are welcome! <3
