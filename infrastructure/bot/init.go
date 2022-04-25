@@ -16,6 +16,7 @@ type Config struct {
     ExpirationTime int     `json:"expiration_time,omitempty"`
     ChatId         []int64 `json:"chat_id,omitempty"`
     TimeDelay      int     `json:"time_delay,omitempty"`
+    SendMessageUri string  `json:"send_message_uri,omitempty"`
 }
 
 var (
@@ -30,6 +31,7 @@ type TelegramBot struct {
     ChatId            []int64
     TimeDelay         int
     ReplyMsg          []string
+    SendMessageUri    string
 }
 
 var teleBot *TelegramBot
@@ -63,6 +65,7 @@ func NewBotTele() *TelegramBot {
             Token:             config.Token,
             ChatId:            config.ChatId,
             TimeDelay:         config.TimeDelay,
+            SendMessageUri:    config.SendMessageUri,
         }
 
         teleBot.SendChat(fmt.Sprintf(constant.InitBot, teleBot.Bot.Self.FirstName+" "+teleBot.Bot.Self.LastName))

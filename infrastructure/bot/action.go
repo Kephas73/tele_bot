@@ -5,8 +5,15 @@ import (
     "botTele/infrastructure/logger"
     "fmt"
     tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+    "net/http"
     "time"
 )
+
+var tr = &http.Transport{
+    MaxIdleConns:          50,
+    MaxIdleConnsPerHost:   50,
+    ResponseHeaderTimeout: 30 * time.Second,
+}
 
 func (botTele *TelegramBot) SendChat(sendMsg interface{}) error {
     botTele.ReconnectBotTele()
@@ -38,5 +45,34 @@ func (botTele *TelegramBot) Status() error {
             }
         }
     }
+    return nil
+}
+
+func (botTele *TelegramBot) SendMessageForApiTele(sendMsg interface{}) error {
+
+    sendMsgUri := fmt.Sprintf(botTele.SendMessageUri, botTele.Token, botTele.ChatId[0], IsBotMsg(fmt.Sprint(sendMsg)))
+    req, err := http.NewRequest("POST", sendMsgUri, nil)
+    if err != nil {
+        logger.Error("TelegramBot::SendMessageForApiTele - Can not create new request error: %v", err)
+        return err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    client := &http.Client{
+        Timeout:   time.Second * 10,
+        Transport: tr,
+    }
+
+    response, err := client.Do(req)
+    if err != nil {
+        logger.Error("TelegramBot::SendMessageForApiTele - Can not exec request error: v", err)
+        return err
+    }
+
+    if response.StatusCode != 200 {
+        logger.Error("TelegramBot::SendMessageForApiTele - Send msg for api error code: %d", response.StatusCode)
+        return fmt.Errorf("send msg for api error code: %d", response.StatusCode)
+    }
+
     return nil
 }

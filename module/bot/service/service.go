@@ -33,7 +33,7 @@ func (bot *BotService) SendChat(data model.RawData) error {
 
     go func() {
         if len(data.Text) != constant.ValueEmpty {
-            err := bot.Bot.SendChat(data.Text)
+            err := bot.Bot.SendMessageForApiTele(data.Text)
             if err != nil {
                 logger.Error("BotService::SendChat: - Send chat error: %v", err)
             }
@@ -43,7 +43,7 @@ func (bot *BotService) SendChat(data model.RawData) error {
     go func() {
         if data.Object != nil {
             b, _ := json.Marshal(data.Object)
-            err := bot.Bot.SendChat(bytes.NewBuffer(b))
+            err := bot.Bot.SendMessageForApiTele(bytes.NewBuffer(b))
             if err != nil {
                 logger.Error("BotService::SendChat: - Send chat error: %v", err)
             }

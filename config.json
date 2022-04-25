@@ -1,5 +1,5 @@
 {
-    "Debug": false,
+    "Debug": true,
     "Server": {
         "Address": ":9096"
     },
@@ -12,11 +12,12 @@
         "Timeout": 30
     },
     "TelegramApi": {
+        "SendMessageUri": "https://api.telegram.org/bot%s/sendMessage?chat_id=%d&text=%s",
         "Token": "",
-        "ExpirationTime": 1,
         "ChatId": [
             11111111
         ],
-        "TimeDelay": 2
+        "TimeDelay": 2,
+        "ExpirationTime": 1
     }
 }
