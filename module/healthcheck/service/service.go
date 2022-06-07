@@ -18,7 +18,7 @@ type HealthCheckService struct {
 
 func NewHealthCheckService(timeout time.Duration) IHealthCheckService {
     return &HealthCheckService{
-        Bot:     bot.NewBotTele(),
+        Bot:     nil,
         Timeout: timeout,
     }
 }

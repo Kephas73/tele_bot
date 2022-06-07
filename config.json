@@ -1,7 +1,7 @@
 {
     "Debug": true,
     "Server": {
-        "Address": ":9096"
+        "Address": ":9099"
     },
     "Log": {
         "Path": "./log/BotTele",
@@ -19,5 +19,24 @@
         ],
         "TimeDelay": 2,
         "ExpirationTime": 1
-    }
+    },
+    "AWS": {
+        "AccessKeyID": "",
+        "SecretAccessKey": "",
+        "CDN": "",
+        "BaseUrl": "",
+        "BucketName": "",
+        "CommunityFolder": ""
+    }, 
+    "MySql": [
+        {
+            "Name": "",
+            "DSN": "",
+            "MaxOpenConnections": 10,
+            "MaxIdleConnections": 10,
+            "Active": 50,
+            "Idle": 50,
+            "Lifetime": 60
+        }
+    ]
 }
