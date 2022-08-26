@@ -12,7 +12,6 @@ import (
     "encoding/json"
     "fmt"
     "github.com/Kephas73/go-lib/s3_client"
-    "github.com/Kephas73/go-lib/sql_client"
     "github.com/Kephas73/go-lib/util"
     "github.com/jszwec/csvutil"
     "io"
@@ -46,12 +45,12 @@ func NewBotService(timeout time.Duration) IBotService {
         return botServiceInstance
     }
 
-    sqlxInstance := sql_client.GetSQLClient(constant.DB_FILE_UP_LOAD).DB
+    //sqlxInstance := sql_client.GetSQLClient(constant.DB_FILE_UP_LOAD).DB
 
     return &BotService{
         Bot:            nil,
         Timeout:        timeout,
-        FileRepository: repository.NewFileRepository(sqlxInstance),
+        //FileRepository: repository.NewFileRepository(sqlxInstance),
     }
 }
 

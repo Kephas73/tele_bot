@@ -15,10 +15,10 @@ func Initialize(e *echo.Echo, timeout time.Duration) {
     mBotController = controller.NewBotController(botService)
     BotServiceGlobal = botService
 
-    go func() {
+   /* go func() {
         botService.WorkerUploadFile()
         time.Sleep(time.Minute * 5)
-    }()
+    }()*/
 
     initRouter(e)
 }
@@ -27,4 +27,8 @@ func initRouter(e *echo.Echo) {
     e.POST("bot/send-chat", mBotController.SendChat)
 
     e.POST("file/upload", mBotController.UploadFile)
+
+    e.GET("locker/etcd", mBotController.LockerEtcd)
+
+    e.GET("locker/etcd-2", mBotController.LockerEtcd2)
 }

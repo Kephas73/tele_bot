@@ -4,9 +4,9 @@ import (
     "botTele/infrastructure/logger"
     "botTele/module/bot"
     "fmt"
+    "github.com/Kephas73/go-lib/lock_etcd"
     logger2 "github.com/Kephas73/go-lib/logger"
     "github.com/Kephas73/go-lib/s3_client"
-    "github.com/Kephas73/go-lib/sql_client"
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
     "github.com/spf13/viper"
@@ -39,7 +39,8 @@ func main() {
     logger.NewLogger(logPath, logPrefix)
     
     s3_client.InstallS3Client()
-    sql_client.InstallSQLClientManager()
+    //sql_client.InstallSQLClientManager()
+    lock_etcd.InstanceEtcdManger()
     
     timeout := time.Duration(viper.GetInt("Context.Timeout")) * time.Second
     
@@ -59,5 +60,4 @@ func main() {
     <-signChan
     logger.Info("Shutdown.....")
     //bot.BotServiceGlobal.SendChatShutdown()
-    
 }

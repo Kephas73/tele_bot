@@ -12,7 +12,7 @@
         "Timeout": 30
     },
     "TelegramApi": {
-        "SendMessageUri": "https://api.telegram.org/bot%s/sendMessage?chat_id=%d&text=%s",
+        "SendMessageUri": "",
         "Token": "",
         "ChatId": [
             11111111
@@ -26,8 +26,9 @@
         "CDN": "",
         "BaseUrl": "",
         "BucketName": "",
-        "CommunityFolder": ""
-    }, 
+        "CommunityFolder": "",
+        "Region": ""
+    },
     "MySql": [
         {
             "Name": "",
@@ -38,5 +39,12 @@
             "Idle": 50,
             "Lifetime": 60
         }
-    ]
+    ],
+    "Etcd": {
+        "Addrs": [
+            ""
+        ],
+        "TLL": 30,
+        "ProjectName": ""
+    }
 }

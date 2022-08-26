@@ -10,17 +10,21 @@ import (
     "botTele/module/bot/service"
     "context"
     "fmt"
+    "github.com/Kephas73/go-lib/lock_etcd"
     "github.com/labstack/echo"
+    "time"
 )
 
 type BotController struct {
     base_controller.BaseController
     Service service.IBotService
+    lock    *lock_etcd.GEtcd
 }
 
 func NewBotController(service service.IBotService) *BotController {
     return &BotController{
         Service: service,
+        lock:    lock_etcd.GetEtcdDiscoveryInstance(),
     }
 }
 
@@ -75,4 +79,27 @@ func (controller *BotController) UploadFile(c echo.Context) error {
     }
 
     return controller.WriteSuccess(c, rs)
+}
+
+func (controller *BotController) LockerEtcd(c echo.Context) error {
+    mux := controller.lock.Locker("tele")
+    mux.Lock()
+    defer mux.Unlock()
+
+    // TODO
+    time.Sleep(5 * time.Second)
+    fmt.Println("Lock:ETCD")
+
+    return controller.WriteSuccessEmptyContent(c)
+}
+
+func (controller *BotController) LockerEtcd2(c echo.Context) error {
+    mux := controller.lock.Locker("tele")
+    mux.Lock()
+    defer mux.Unlock()
+
+    // TODO
+    fmt.Println("Lock:ETCD2")
+
+    return controller.WriteSuccessEmptyContent(c)
 }
