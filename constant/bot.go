@@ -9,6 +9,8 @@ var ReplyMsg = []string{
     "Xin chào %s, bạn đang tham gia vào group này!",
 }
 
+var ListIP = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+
 const (
     InitBot      string = "👉 Bot: %s đã bật 😍 😍 😍"
     ReconnectBot string = "👉 Bot: %s đã được kết nối lại 😓 😓 😓"
@@ -27,4 +29,9 @@ other - tự động trả lời
 
 const (
     ExpiresThenMinute = 10
+
+    TeleBotCache = "tele_bot"
+    LockRandomIP = "random_ip"
+
+    KeyListIP = "list_ip"
 )

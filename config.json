@@ -44,7 +44,23 @@
         "Addrs": [
             ""
         ],
-        "TLL": 30,
-        "ProjectName": ""
-    }
+        "TTL": 120,
+        "ProjectName": "tele-bot"
+    },
+    "Redis": [
+        {
+            "Name": "tele_bot",
+            "Addrs": [
+                ""
+            ],
+            "Idle": 100,
+            "Active": 100,
+            "DialTimeout": 5,
+            "ReadTimeout": 5,
+            "WriteTimeout": 5,
+            "IdleTimeout": 10,
+            "DBNum": 0,
+            "MaxRetries": 3
+        }
+    ]
 }

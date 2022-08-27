@@ -28,7 +28,6 @@ func initRouter(e *echo.Echo) {
 
     e.POST("file/upload", mBotController.UploadFile)
 
-    e.GET("locker/etcd", mBotController.LockerEtcd)
-
-    e.GET("locker/etcd-2", mBotController.LockerEtcd2)
+    e.POST("ip/init", mBotController.InitIP)
+    e.GET("ip/random", mBotController.RandomIP)
 }

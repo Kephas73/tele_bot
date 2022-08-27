@@ -10,21 +10,17 @@ import (
     "botTele/module/bot/service"
     "context"
     "fmt"
-    "github.com/Kephas73/go-lib/lock_etcd"
     "github.com/labstack/echo"
-    "time"
 )
 
 type BotController struct {
     base_controller.BaseController
     Service service.IBotService
-    lock    *lock_etcd.GEtcd
 }
 
 func NewBotController(service service.IBotService) *BotController {
     return &BotController{
         Service: service,
-        lock:    lock_etcd.GetEtcdDiscoveryInstance(),
     }
 }
 
@@ -81,25 +77,26 @@ func (controller *BotController) UploadFile(c echo.Context) error {
     return controller.WriteSuccess(c, rs)
 }
 
-func (controller *BotController) LockerEtcd(c echo.Context) error {
-    mux := controller.lock.Locker("tele")
-    mux.Lock()
-    defer mux.Unlock()
+func (controller *BotController) InitIP(c echo.Context) error {
 
-    // TODO
-    time.Sleep(5 * time.Second)
-    fmt.Println("Lock:ETCD")
+    _, err := controller.Service.InitIP()
+    if err != nil {
+        errApi := error_base.New(error_base.ErrorRandomIP, err)
+        resp := response_base.NewErrorResponse(errApi)
+        return controller.WriteBadRequest(c, resp)
+    }
 
     return controller.WriteSuccessEmptyContent(c)
 }
 
-func (controller *BotController) LockerEtcd2(c echo.Context) error {
-    mux := controller.lock.Locker("tele")
-    mux.Lock()
-    defer mux.Unlock()
+func (controller *BotController) RandomIP(c echo.Context) error {
 
-    // TODO
-    fmt.Println("Lock:ETCD2")
+    ip, err := controller.Service.RandomIP()
+    if err != nil {
+        errApi := error_base.New(error_base.ErrorRandomIP, err)
+        resp := response_base.NewErrorResponse(errApi)
+        return controller.WriteBadRequest(c, resp)
+    }
 
-    return controller.WriteSuccessEmptyContent(c)
+    return controller.WriteSuccess(c, ip)
 }

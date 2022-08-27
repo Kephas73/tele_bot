@@ -10,9 +10,13 @@ import (
     "context"
     "encoding/csv"
     "encoding/json"
+    "errors"
     "fmt"
+    "github.com/Kephas73/go-lib/lock_etcd"
+    "github.com/Kephas73/go-lib/redis_client"
     "github.com/Kephas73/go-lib/s3_client"
     "github.com/Kephas73/go-lib/util"
+    "github.com/go-redis/redis/v8"
     "github.com/jszwec/csvutil"
     "io"
     "io/ioutil"
@@ -29,12 +33,17 @@ type IBotService interface {
     AutoReply()
     UploadFiles(ctx context.Context, files []*multipart.FileHeader) (*model.File, error)
     WorkerUploadFile()
+    RandomIP() (string, error)
+    InitIP() ([]string, error)
 }
 
 type BotService struct {
     Bot            *bot.TelegramBot
     FileRepository repository.IFileRepository
     Timeout        time.Duration
+    LockEtcd       *lock_etcd.GEtcd
+    sync.Mutex
+    CacheRepository *redis_client.RedisPool
 }
 
 var botServiceInstance *BotService
@@ -48,9 +57,11 @@ func NewBotService(timeout time.Duration) IBotService {
     //sqlxInstance := sql_client.GetSQLClient(constant.DB_FILE_UP_LOAD).DB
 
     return &BotService{
-        Bot:            nil,
-        Timeout:        timeout,
+        Bot:     nil,
+        Timeout: timeout,
         //FileRepository: repository.NewFileRepository(sqlxInstance),
+        CacheRepository: redis_client.GetRedisClient(constant.TeleBotCache),
+        LockEtcd:        lock_etcd.GetEtcdDiscoveryInstance(),
     }
 }
 
@@ -273,4 +284,93 @@ func DecodeMember(r io.Reader) (members []*model.Member, err error) {
 
 func ValidateMember([]*model.Member) error {
     return nil
+}
+
+func (bot *BotService) RandomIP() (string, error) {
+
+    //// Request vào chờ để lấy khóa
+    //mux := bot.LockEtcd.Locker(constant.LockRandomIP)
+    ///*    mux.Lock()
+    //     mux.Unlock()*/
+    //if err := mux.Lock().LockerActionError; err != nil {
+    //   logger.Error("BotService::RandomIP: Lock Etcd error: %v", err)
+    //   return "", err
+    //}
+    //defer mux.Unlock()
+
+    bot.Lock()
+    defer bot.Unlock()
+
+    timeNow := time.Now()
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
+    defer cancel()
+
+    // Lấy phần tử có trọng số thấp nhấp 
+    // 0: lấy bắt đầu từ phần tử thứ 0
+    // -1: lấy tất cả.
+    listIP, err := bot.CacheRepository.Get().ZRevRange(ctx, constant.KeyListIP, 0, -1).Result()
+    if err != nil {
+        // Chạy lại quá trình init
+        if listIP, err = bot.initIP(); err != nil {
+            logger.Error("BotService::RandomIP: Get list or init ip error: %v", err)
+            return "", err
+        }
+    }
+
+    if len(listIP) == 0 {
+        logger.Error("BotService::RandomIP: List ip empty!")
+        return "", errors.New("empty")
+    }
+
+    // Sau khi lấy thì thực hiện tăng trong số lên 1 cho phần tử
+    err = bot.CacheRepository.Get().ZIncrBy(context.Background(), constant.KeyListIP, 1, listIP[len(listIP)-1]).Err()
+    if err != nil {
+        logger.Error("BotService::RandomIP: ZIncrBy error: %v", err)
+        return "", err
+    }
+    logger.Info("BotService::RandomIP: Done: %d", time.Since(timeNow).Milliseconds())
+
+    // Lấy thằng vị trí cuối cùng, vì list đã được sắp xếp rồi.
+    return listIP[len(listIP)-1], nil
+}
+
+// InitIP func:
+// Chỉ chạy khi lấy redis bị lỗi
+// Hoặc khi thêm mới các ip mới
+// Hoặc admin muốn reset lại từ đầu
+// Hoặc khi khởi động lại lại service
+func (bot *BotService) InitIP() ([]string, error) {
+
+    //// Request vào chờ để lấy khóa
+    //mux := bot.LockEtcd.Locker(constant.LockRandomIP)
+    //if err := mux.Lock().LockerActionError; err != nil {
+    //    logger.Error("BotService::RandomIP: Lock Etcd error: %v", err)
+    //}
+    //defer mux.Unlock()
+    bot.Lock()
+    defer bot.Unlock()
+
+    return bot.initIP()
+}
+
+func (bot *BotService) initIP() ([]string, error) {
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
+    defer cancel()
+
+    // Đoạn này có thể lưu IP ở DB để lấy ra và lưu
+    pipe := bot.CacheRepository.Get().Pipeline()
+    for _, ip := range constant.ListIP {
+        pipe.ZAdd(ctx, constant.KeyListIP, &redis.Z{
+            Member: ip,
+            Score:  0, // Default init
+        })
+    }
+
+    _, err := pipe.Exec(ctx)
+    if err != nil {
+        logger.Error("BotService::initIP: Error: %v", err)
+        return nil, err
+    }
+
+    return constant.ListIP, nil
 }

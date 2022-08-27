@@ -6,6 +6,7 @@ import (
     "fmt"
     "github.com/Kephas73/go-lib/lock_etcd"
     logger2 "github.com/Kephas73/go-lib/logger"
+    "github.com/Kephas73/go-lib/redis_client"
     "github.com/Kephas73/go-lib/s3_client"
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
@@ -37,24 +38,25 @@ func main() {
     logPrefix := viper.GetString("Log.Prefix")
     logger2.NewLogger(logPath, logPrefix)
     logger.NewLogger(logPath, logPrefix)
-    
+
     s3_client.InstallS3Client()
     //sql_client.InstallSQLClientManager()
     lock_etcd.InstanceEtcdManger()
-    
+    redis_client.InstallRedisClientManager()
+
     timeout := time.Duration(viper.GetInt("Context.Timeout")) * time.Second
-    
+
     e := echo.New()
     e.Server.SetKeepAlivesEnabled(false)
     e.Server.ReadTimeout = time.Minute * 60
     e.Server.WriteTimeout = time.Minute * 60
-    
+
     e.Use(middleware.CORS())
-    
+
     signChan := make(chan os.Signal, 1)
     //healthcheck.Initialize(e, timeout)
     bot.Initialize(e, timeout)
-    
+
     go e.Start(viper.GetString("Server.Address"))
     signal.Notify(signChan, os.Interrupt, syscall.SIGTERM)
     <-signChan
