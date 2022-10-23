@@ -8,8 +8,9 @@ const (
 )
 
 const (
-    ModeTrimLeadingSpace bool   = true  // Ignore whitespace
-    ModeComma            string = ":"   // Separator character
+    ModeTrimLeadingSpace bool   = true // Ignore whitespace
+    ModeComma            string = ":"  // Separator character
+    ModeComma2           string = ","  // Separator character
     ModeLazyQuotes       bool   = true // If LazyQuotes is true, a quote may appear in an unquoted field and a non-doubled quote may appear in a quoted field.
-    ModeFieldsPerRecord  int    = 0     // Read sets it to the number of fields in the first record
+    ModeFieldsPerRecord  int    = 0    // Read sets it to the number of fields in the first record
 )

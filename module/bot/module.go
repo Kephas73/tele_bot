@@ -30,4 +30,5 @@ func initRouter(e *echo.Echo) {
 
     e.POST("ip/init", mBotController.InitIP)
     e.GET("ip/random", mBotController.RandomIP)
+    e.GET("class", mBotController.GetClass)
 }

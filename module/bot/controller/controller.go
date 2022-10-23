@@ -100,3 +100,15 @@ func (controller *BotController) RandomIP(c echo.Context) error {
 
     return controller.WriteSuccess(c, ip)
 }
+
+func (controller *BotController) GetClass(c echo.Context) error {
+
+    class, err := controller.Service.GetClass()
+    if err != nil {
+        errApi := error_base.New(error_base.ErrorRandomIP, err)
+        resp := response_base.NewErrorResponse(errApi)
+        return controller.WriteBadRequest(c, resp)
+    }
+
+    return controller.WriteSuccess(c, class)
+}

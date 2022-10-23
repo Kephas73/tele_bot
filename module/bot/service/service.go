@@ -2,6 +2,7 @@ package service
 
 import (
     "botTele/constant"
+    "botTele/global"
     "botTele/infrastructure/bot"
     "botTele/infrastructure/logger"
     "botTele/model"
@@ -35,6 +36,7 @@ type IBotService interface {
     WorkerUploadFile()
     RandomIP() (string, error)
     InitIP() ([]string, error)
+    GetClass() ([]*model.Class, error)
 }
 
 type BotService struct {
@@ -60,8 +62,8 @@ func NewBotService(timeout time.Duration) IBotService {
         Bot:     nil,
         Timeout: timeout,
         //FileRepository: repository.NewFileRepository(sqlxInstance),
-        CacheRepository: redis_client.GetRedisClient(constant.TeleBotCache),
-        LockEtcd:        lock_etcd.GetEtcdDiscoveryInstance(),
+        //CacheRepository: redis_client.GetRedisClient(constant.TeleBotCache),
+        //LockEtcd:        lock_etcd.GetEtcdDiscoveryInstance(),
     }
 }
 
@@ -373,4 +375,15 @@ func (bot *BotService) initIP() ([]string, error) {
     }
 
     return constant.ListIP, nil
+}
+
+func (bot *BotService) GetClass() ([]*model.Class, error) {
+    class, err := global.GetClassGlobal()
+    if err != nil {
+        logger.Error("BotService::GetClass: Error: %v", err)
+        return nil, err
+    }
+
+    // Get ra rồi anh muốn làm gì thì làm
+    return class, err
 }

@@ -18,3 +18,8 @@ type Member struct {
     Address string `csv:"address"`
     Age     int    `csv:"age"`
 }
+
+type Class struct {
+    Name   string `json:"name" csv:"name"`
+    Number int    `json:"number" csv:"number"`
+}
