@@ -9,10 +9,14 @@ import (
     "github.com/spf13/viper"
     "io"
     "os"
+    "sync"
     "unicode/utf8"
 )
 
-var class []*model.Class
+var (
+    class []*model.Class
+    lock  = sync.Mutex{}
+)
 
 func InitClassGlobal() ([]*model.Class, error) {
     // path file csv
@@ -32,6 +36,8 @@ func InitClassGlobal() ([]*model.Class, error) {
         return nil, errors.New("class is empty")
     }
 
+    lock.Lock()
+    defer lock.Unlock()
     class = rs
     return class, nil
 }
