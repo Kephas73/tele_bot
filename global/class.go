@@ -48,10 +48,8 @@ func GetClassGlobal() ([]*model.Class, error) {
         if len(rs) == 0 {
             return nil, errors.New("class is empty")
         }
-
-        class = rs
     }
-  
+
     return class, nil
 }
 
@@ -66,15 +64,15 @@ func ReadFileClass(r io.Reader) (class []*model.Class, err error) {
     // in real application this should be done once in init function.
     // Ko cần header thì dùng đoạn này
     /*userHeader, err := csvutil.Header(model.Class{}, "csv")
-    if err != nil {
-       return nil, err
-    }
+      if err != nil {
+         return nil, err
+      }
 
-    dec, err := csvutil.NewDecoder(csvReader)
-    if err != nil {
-        return nil, err
-    }*/
-    
+      dec, err := csvutil.NewDecoder(csvReader)
+      if err != nil {
+          return nil, err
+      }*/
+
     // Có header thì dùng đoạn này.
     dec, err := csvutil.NewDecoder(csvReader)
     if err != nil {
