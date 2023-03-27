@@ -14,6 +14,7 @@ type IFileRepository interface {
     Insert(ctx context.Context, file *model.File) (*model.File, error)
     Update(ctx context.Context, files ...*model.File) ([]*model.File, error)
     SelectFileByState(ctx context.Context, state int) ([]*model.File, error)
+    SelectDynamic(ctx context.Context, queryType int) ([]map[string]interface{}, []string, error)
 }
 
 type FileRepository struct {
@@ -82,4 +83,53 @@ func (repository *FileRepository) SelectFileByState(ctx context.Context, state i
     }
 
     return result, nil
+}
+
+func (repository *FileRepository) SelectDynamic(ctx context.Context, queryType int) ([]map[string]interface{}, []string, error) {
+    query := `SELECT id, file_path, state, description, created_time, updated_time FROM file_upload `
+
+    if queryType == 1 {
+        query = `SELECT id, file_path, v2, state, description, created_time, updated_time FROM file_upload_v2 `
+    }
+
+    rows, err := repository.QueryxContext(ctx, query)
+    if err != nil {
+        logger.Error("FileRepository::SelectI: -Query: %s, Error: %v", query, err)
+        return nil, nil, err
+    }
+
+    return SelectScan(rows)
+}
+
+func SelectScan(rows *sqlx.Rows) ([]map[string]interface{}, []string, error) {
+    defer rows.Close()
+
+    columns, err := rows.Columns()
+    if err != nil {
+        return nil, nil, err
+    }
+    numColumns := len(columns)
+
+    values := make([]interface{}, numColumns)
+    for i := range values {
+        values[i] = new(string)
+    }
+
+    var results []map[string]interface{}
+    for rows.Next() {
+        if err := rows.Scan(values...); err != nil {
+            return nil, nil, err
+        }
+
+        dest := make(map[string]interface{}, numColumns)
+        for i, column := range columns {
+            dest[column] = *(values[i].(*string))
+        }
+        results = append(results, dest)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, nil, err
+    }
+    return results, columns, nil
 }

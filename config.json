@@ -31,8 +31,8 @@
     },
     "MySql": [
         {
-            "Name": "",
-            "DSN": "",
+            "Name": "gametv_vn_prod_v4",
+            "DSN": "root:@tcp(127.0.0.1)/test?charset=utf8mb4&parseTime=true",
             "MaxOpenConnections": 10,
             "MaxIdleConnections": 10,
             "Active": 50,

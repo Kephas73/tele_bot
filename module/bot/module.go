@@ -15,7 +15,7 @@ func Initialize(e *echo.Echo, timeout time.Duration) {
     mBotController = controller.NewBotController(botService)
     BotServiceGlobal = botService
 
-   /* go func() {
+    /* go func() {
         botService.WorkerUploadFile()
         time.Sleep(time.Minute * 5)
     }()*/
@@ -31,4 +31,6 @@ func initRouter(e *echo.Echo) {
     e.POST("ip/init", mBotController.InitIP)
     e.GET("ip/random", mBotController.RandomIP)
     e.GET("class", mBotController.GetClass)
+
+    e.GET("queryI", mBotController.ListI)
 }

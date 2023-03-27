@@ -6,6 +6,7 @@ import (
     "botTele/module/bot"
     "fmt"
     logger2 "github.com/Kephas73/go-lib/logger"
+    "github.com/Kephas73/go-lib/sql_client"
     "github.com/labstack/echo"
     "github.com/labstack/echo/middleware"
     "github.com/spf13/viper"
@@ -38,7 +39,7 @@ func main() {
     logger.NewLogger(logPath, logPrefix)
 
     //s3_client.InstallS3Client()
-    //sql_client.InstallSQLClientManager()
+    sql_client.InstallSQLClientManager()
     //lock_etcd.InstanceEtcdManger()
     //redis_client.InstallRedisClientManager()
 

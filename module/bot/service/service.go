@@ -16,12 +16,14 @@ import (
     "github.com/Kephas73/go-lib/lock_etcd"
     "github.com/Kephas73/go-lib/redis_client"
     "github.com/Kephas73/go-lib/s3_client"
+    "github.com/Kephas73/go-lib/sql_client"
     "github.com/Kephas73/go-lib/util"
     "github.com/go-redis/redis/v8"
     "github.com/jszwec/csvutil"
     "io"
     "io/ioutil"
     "mime/multipart"
+    "os"
     "strings"
     "sync"
     "time"
@@ -37,6 +39,7 @@ type IBotService interface {
     RandomIP() (string, error)
     InitIP() ([]string, error)
     GetClass() ([]*model.Class, error)
+    ListDynamic(queryType int) (string, error)
 }
 
 type BotService struct {
@@ -56,12 +59,12 @@ func NewBotService(timeout time.Duration) IBotService {
         return botServiceInstance
     }
 
-    //sqlxInstance := sql_client.GetSQLClient(constant.DB_FILE_UP_LOAD).DB
+    sqlxInstance := sql_client.GetSQLClient(constant.DB_FILE_UP_LOAD).DB
 
     return &BotService{
-        Bot:     nil,
-        Timeout: timeout,
-        //FileRepository: repository.NewFileRepository(sqlxInstance),
+        Bot:            nil,
+        Timeout:        timeout,
+        FileRepository: repository.NewFileRepository(sqlxInstance),
         //CacheRepository: redis_client.GetRedisClient(constant.TeleBotCache),
         //LockEtcd:        lock_etcd.GetEtcdDiscoveryInstance(),
     }
@@ -384,6 +387,58 @@ func (bot *BotService) GetClass() ([]*model.Class, error) {
         return nil, err
     }
 
+    //fmt.Println(class[6].Name)
+
     // Get ra rồi anh muốn làm gì thì làm
     return class, err
+}
+
+func (bot *BotService) ListDynamic(queryType int) (string, error) {
+    data, col, err := bot.FileRepository.SelectDynamic(context.Background(), queryType)
+    if err != nil {
+        logger.Error("BotService::GetClass: Error: %v", err)
+        return "", err
+    }
+
+    records := make([][]string, 0)
+    // header
+    records = append(records, col)
+
+    for _, v := range data {
+        item := make([]string, 0)
+        for _, c := range col {
+            if s, ok := v[c]; ok {
+                sCast, ok1 := s.(string)
+                if ok1 {
+                    item = append(item, sCast)
+                } else {
+                    item = append(item, "")
+                }
+                fmt.Println(fmt.Sprintf("Key: %s, Data: %v", c, s))
+            }
+        }
+
+        records = append(records, item)
+    }
+
+    fmt.Println(records)
+    f, err := os.Create(fmt.Sprintf("%s_%d.cvs", util.RandomNumber(10), queryType))
+    defer f.Close()
+    if err != nil {
+        logger.Error("BotService::GetClass: Error: %v", err)
+        return "", err
+    }
+
+    w := csv.NewWriter(f)
+    defer w.Flush()
+
+    for _, record := range records {
+        if err = w.Write(record); err != nil {
+            logger.Error("BotService::GetClass: Error: %v", err)
+            return "", err
+        }
+    }
+
+    // Get ra rồi anh muốn làm gì thì làm
+    return "", nil
 }

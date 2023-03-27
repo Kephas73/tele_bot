@@ -11,6 +11,7 @@ import (
     "context"
     "fmt"
     "github.com/labstack/echo"
+    "strconv"
 )
 
 type BotController struct {
@@ -111,4 +112,18 @@ func (controller *BotController) GetClass(c echo.Context) error {
     }
 
     return controller.WriteSuccess(c, class)
+}
+
+func (controller *BotController) ListI(c echo.Context) error {
+
+    qType, _ := strconv.Atoi(c.QueryParam("q_type"))
+
+    dtI, err := controller.Service.ListDynamic(qType)
+    if err != nil {
+        errApi := error_base.New(error_base.ErrorRandomIP, err)
+        resp := response_base.NewErrorResponse(errApi)
+        return controller.WriteBadRequest(c, resp)
+    }
+
+    return controller.WriteSuccess(c, dtI)
 }
